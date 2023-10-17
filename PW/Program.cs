@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices;
+using System.Drawing;
+
 public class Program
 {
-    private static readonly string dataFile = @"D:\.important\MyTools\PW\PW_Save.json";
+    private static readonly string dataFile = @"C:\Users\Public\MyToolsSave\PW\PW_Save.json";
     public static string DataFile { get => dataFile; }
 
     public static void Main(string[] args)
@@ -18,10 +20,11 @@ public class Program
                 Console.WriteLine("该文件密码:{0}", pwDict[fh]);
                 AddTextClipboard(pwDict[fh]);
             }
-            //foreach (var kvp in pwDict)
-            //{
-            //    Console.WriteLine($"Key: {kvp.Key}, Value: {kvp.Value}");
-            //}
+            else
+            {
+                WriteWithColor("[Error]:", ConsoleColor.Red);
+                Console.WriteLine("未找到该文件密码。");
+            }
             Console.Write("按任意键退出...");
             Console.ReadKey();
         }
@@ -35,22 +38,47 @@ public class Program
             if (!pwDict.ContainsKey(fh)) // 找不到 则添加一条
             {
                 string pw = Console.ReadLine();
-                if (pw != null)
+                if(!string.IsNullOrEmpty(pw))
                 {
                     pwDict.Add(fh, pw);
+                    Console.WriteLine("密码保存成功");
+                    // 写入文件
+                    DictToJson(pwDict);
                 }
             }
-            else // 已经有了 修改这一条
+            else // 已经有了 触发警告 或 修改这一条
             {
+                WriteWithColor("[Warning]:", ConsoleColor.Yellow);
+                Console.WriteLine("本文件已保存了密码,密码为 {0} ,密码已复制到剪切板", pwDict[fh]);
+                AddTextClipboard(pwDict[fh]);
+                Console.WriteLine("输入 Q 回车退出，或者输入新密码");
                 string pw = Console.ReadLine();
-                if (pw != null)
+                if (!string.IsNullOrEmpty(pw))
                 {
-                    pwDict[fh] = pw;
+                    if (pw == "Q" || pw == "q")
+                        return;
+                    else
+                        pwDict[fh] = pw;
                 }
+                Console.WriteLine("密码保存成功");
+                // 写入文件
+                DictToJson(pwDict);
             }
-            // 写入文件
-            DictToJson(pwDict);
-            Console.WriteLine("密码保存成功");
+ 
+            Console.Write("按任意键退出...");
+            Console.ReadKey();
+        }
+        #endregion
+        #region help
+        if (args[0] == "help")
+        {
+            Console.WriteLine("密码文件保存在 {0}", dataFile);
+            Console.WriteLine("以下为所有密码");
+            Dictionary<string, string> pwDict = JsonToDict();
+            foreach (var kvp in pwDict)
+            {
+                Console.WriteLine($"文件标记: {kvp.Key}, 密码: {kvp.Value}");
+            }
             Console.Write("按任意键退出...");
             Console.ReadKey();
         }
@@ -85,10 +113,7 @@ public class Program
         string json = File.ReadAllText(DataFile);
         // 将JSON字符串转化为Dictionary
         Dictionary<string, string> data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-        if (data != null)
-            return data;
-        else
-            return new();
+        return data!;
     }
     #endregion
 
@@ -129,13 +154,20 @@ public class Program
 
             SetClipboardData(CF_UNICODETEXT, hGlobal);
             CloseClipboard();
+            Console.WriteLine("已复制到剪切板: " + textToCopy);
         }
         else
         {
             Console.WriteLine("无法访问剪切板。");
         }
-
-        Console.WriteLine("已复制到剪切板: " + textToCopy);
     }
     #endregion
+
+    public static void WriteWithColor(string str, ConsoleColor color) 
+    {
+        ConsoleColor currentForeColor = Console.ForegroundColor;
+        Console.ForegroundColor = color;
+        Console.Write(str);
+        Console.ForegroundColor = currentForeColor;
+    }
 }
