@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using System.Runtime.InteropServices;
 using System.Drawing;
 
+namespace PW;
+
 public class Program
 {
     private static readonly string dataFile = @"C:\Users\Public\MyToolsSave\PW\PW_Save.json";
@@ -38,7 +40,7 @@ public class Program
             if (!pwDict.ContainsKey(fh)) // 找不到 则添加一条
             {
                 string pw = Console.ReadLine();
-                if(!string.IsNullOrEmpty(pw))
+                if (!string.IsNullOrEmpty(pw))
                 {
                     pwDict.Add(fh, pw);
                     Console.WriteLine("密码保存成功");
@@ -64,7 +66,7 @@ public class Program
                 // 写入文件
                 DictToJson(pwDict);
             }
- 
+
             Console.Write("按任意键退出...");
             Console.ReadKey();
         }
@@ -87,15 +89,11 @@ public class Program
     #region 文件 hash
     public static string FileHash(string filePath)
     {
-        using (var md5 = MD5.Create())
-        {
-            using (var stream = File.OpenRead(filePath))
-            {
-                var hash = md5.ComputeHash(stream);
-                var hashValue = BitConverter.ToString(hash).Replace("-", "").ToLower();
-                return hashValue;
-            }
-        }
+        using var md5 = MD5.Create();
+        using var stream = File.OpenRead(filePath);
+        var hash = md5.ComputeHash(stream);
+        var hashValue = BitConverter.ToString(hash).Replace("-", "").ToLower();
+        return hashValue;
     }
     #endregion
     #region json 和 Dict 互转
@@ -163,7 +161,7 @@ public class Program
     }
     #endregion
 
-    public static void WriteWithColor(string str, ConsoleColor color) 
+    public static void WriteWithColor(string str, ConsoleColor color)
     {
         ConsoleColor currentForeColor = Console.ForegroundColor;
         Console.ForegroundColor = color;
