@@ -8,7 +8,10 @@ namespace PW;
 public class Program
 {
     private static readonly string dataFile = @"C:\Users\Public\MyToolsSave\PW\PW_Save.json";
-    public static string DataFile { get => dataFile; }
+    public static string DataFile
+    {
+        get => dataFile;
+    }
 
     public static void Main(string[] args)
     {
@@ -86,6 +89,7 @@ public class Program
         }
         #endregion
     }
+
     #region 文件 hash
     public static string FileHash(string filePath)
     {
@@ -105,12 +109,15 @@ public class Program
         // 保存JSON字符串到文件
         File.WriteAllText(DataFile, json);
     }
+
     public static Dictionary<string, string> JsonToDict()
     {
         // 从JSON文件中读取JSON字符串
         string json = File.ReadAllText(DataFile);
         // 将JSON字符串转化为Dictionary
-        Dictionary<string, string> data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+        Dictionary<string, string> data = JsonConvert.DeserializeObject<Dictionary<string, string>>(
+            json
+        );
         return data!;
     }
     #endregion
@@ -138,6 +145,7 @@ public class Program
     private static extern bool GlobalUnlock(IntPtr hMem);
 
     private const uint CF_UNICODETEXT = 13;
+
     static void AddTextClipboard(string textToCopy)
     {
         if (OpenClipboard(IntPtr.Zero))
