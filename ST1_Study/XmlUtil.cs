@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using System.Xml;
+
 namespace ST1_Study;
+
 // from https://github.com/dotnet-easy/easytool/blob/main/EasyTool.Core/ToolCategory/XmlUtil.cs
 #pragma warning disable CS8603 // 可能返回 null 引用。
 #pragma warning disable CS8602 // 解引用可能出现空引用。
